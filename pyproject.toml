@@ -1,0 +1,139 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pydantic-gitlab"
+version = "0.1.0"
+description = "A modern Python library"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+authors = [
+    {name = "Evgenii Lepikhin", email = "johnlepikhin@gmail.com"},
+]
+keywords = ["python", "library"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "pytest-asyncio>=0.21",
+    "mypy>=1.0",
+    "ruff>=0.1.0",
+    "pre-commit>=3.0",
+    "black>=23.0",
+]
+docs = [
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.0",
+    "mkdocstrings[python]>=0.20",
+]
+
+[project.urls]
+Homepage = "https://github.com/johnlepikhin/pydantic-gitlab"
+Documentation = "https://pydantic-gitlab.readthedocs.io"
+Repository = "https://github.com/johnlepikhin/pydantic-gitlab"
+Issues = "https://github.com/johnlepikhin/pydantic-gitlab/issues"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.github",
+    "/docs",
+    "/tests",
+    "/.gitignore",
+    "/.pre-commit-config.yaml",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pydantic_gitlab"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "--cov=pydantic_gitlab",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "-v",
+]
+
+[tool.mypy]
+python_version = "3.8"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+no_implicit_reexport = true
+
+[tool.coverage.run]
+source = ["src/pydantic_gitlab"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "DTZ",    # flake8-datetimez
+    "T10",    # flake8-debugger
+    "RET",    # flake8-return
+    "SIM",    # flake8-simplify
+    "TID",    # flake8-tidy-imports
+    "ARG",    # flake8-unused-arguments
+    "PTH",    # flake8-use-pathlib
+    "ERA",    # eradicate
+    "PD",     # pandas-vet
+    "PGH",    # pygrep-hooks
+    "PL",     # pylint
+    "RUF",    # ruff-specific rules
+]
+
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "PLR0913", # too many arguments
+    "PLR2004", # magic value comparison
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "PLR2004", "SIM300"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pydantic_gitlab"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

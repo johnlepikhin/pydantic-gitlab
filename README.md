@@ -13,7 +13,7 @@ A modern Python library for parsing and validating GitLab CI YAML files using Py
 - ✅ Full support for GitLab CI YAML syntax
 - 🔍 Comprehensive validation with helpful error messages
 - 📦 Type-safe dataclasses for all GitLab CI structures
-- 🐍 Python 3.8+ support
+- 🐍 Python 3.9+ support
 - 📝 Excellent IDE support with autocompletion
 
 ## Installation

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pydantic-gitlab"
-version = "0.1.4"
+version = "0.1.5"
 description = "Pydantic models for parsing and validating GitLab CI/CD YAML configuration files"
 readme = "README.md"
 requires-python = ">=3.9"

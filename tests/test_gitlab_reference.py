@@ -1,7 +1,6 @@
 """Test GitLabReference support."""
 
-import pytest
-from pydantic_gitlab import GitLabCI, safe_load_gitlab_yaml, safe_dump_gitlab_yaml
+from pydantic_gitlab import GitLabCI, safe_dump_gitlab_yaml, safe_load_gitlab_yaml
 
 
 def test_gitlab_reference_in_scripts():
@@ -26,16 +25,16 @@ test-job:
 """
     # Parse without resolving
     data = safe_load_gitlab_yaml(yaml_content, resolve_refs=False)
-    
+
     # Should parse successfully
     gitlab_ci = GitLabCI(**data)
-    
+
     # Check that references are preserved
     job = gitlab_ci.jobs['test-job']
     assert len(job.script) == 2
     assert str(job.script[0]).startswith('GitLabReference')
     assert job.script[1] == 'echo "Additional command"'
-    
+
     # Check serialization
     yaml_output = safe_dump_gitlab_yaml(data)
     assert '!reference' in yaml_output
@@ -65,25 +64,20 @@ deploy-job:
 """
     # Parse without resolving
     data = safe_load_gitlab_yaml(yaml_content, resolve_refs=False)
-    
+
     # Should parse successfully
     gitlab_ci = GitLabCI(**data)
-    
+
     # Check whole variables reference
     test_job = gitlab_ci.jobs['test-job']
     assert str(test_job.variables).startswith('GitLabReference')
-    
+
     # Check individual variable references
     deploy_job = gitlab_ci.jobs['deploy-job']
     # When dict contains GitLabReference, it's preserved as dict in our validator
     assert deploy_job.variables is not None
     # The variables should contain GitLabReference objects
-    if hasattr(deploy_job.variables, 'variables'):
-        # It's a GitLabCIJobVariables object
-        vars_dict = deploy_job.variables.variables
-    else:
-        # It's a dict
-        vars_dict = deploy_job.variables
+    vars_dict = deploy_job.variables.variables if hasattr(deploy_job.variables, 'variables') else deploy_job.variables
     assert 'CUSTOM_VAR' in vars_dict
 
 
@@ -112,15 +106,15 @@ deploy-job:
 """
     # Parse without resolving
     data = safe_load_gitlab_yaml(yaml_content, resolve_refs=False)
-    
+
     # Should parse successfully
     gitlab_ci = GitLabCI(**data)
-    
+
     # Check rules reference
     test_job = gitlab_ci.jobs['test-job']
     assert len(test_job.rules) == 1
     assert str(test_job.rules[0]).startswith('GitLabReference')
-    
+
     # Check mixed rules
     deploy_job = gitlab_ci.jobs['deploy-job']
     assert len(deploy_job.rules) == 2
@@ -142,10 +136,10 @@ test-job:
 """
     # Parse with resolution (default)
     data = safe_load_gitlab_yaml(yaml_content)
-    
+
     # Should parse and resolve successfully
     gitlab_ci = GitLabCI(**data)
-    
+
     # Check that reference was resolved
     job = gitlab_ci.jobs['test-job']
     assert job.before_script == ['echo "Setup"', 'source env.sh']
@@ -170,15 +164,15 @@ job:
 """
     # Parse without resolving
     data1 = safe_load_gitlab_yaml(yaml_content, resolve_refs=False)
-    
+
     # Dump back to YAML
     yaml_output = safe_dump_gitlab_yaml(data1)
-    
+
     # Parse again
     data2 = safe_load_gitlab_yaml(yaml_output, resolve_refs=False)
-    
+
     # Should be equal
     assert data1 == data2
-    
+
     # Should preserve !reference tags
     assert '!reference' in yaml_output

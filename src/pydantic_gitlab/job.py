@@ -312,7 +312,7 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("rules", mode="before")
     @classmethod
-    def normalize_rules(cls, v: Any) -> Optional[list[GitLabCIRule]]:
+    def normalize_rules(cls, v: Any) -> Any:
         """Normalize rules to list of GitLabCIRule."""
         if v is None:
             return None
@@ -402,7 +402,7 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("variables", mode="before")
     @classmethod
-    def parse_variables_field(cls, v: Any) -> Optional[GitLabCIJobVariables]:
+    def parse_variables_field(cls, v: Any) -> Any:
         """Parse variables field."""
         if v is None:
             return None

@@ -11,16 +11,16 @@ class GitLabReference:
     def __init__(self, path: list[str]):
         self.path = path
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"GitLabReference({self.path})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """Check equality based on path."""
         if not isinstance(other, GitLabReference):
             return False
         return self.path == other.path
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Make GitLabReference hashable."""
         return hash(tuple(self.path))
 
@@ -44,7 +44,7 @@ def reference_constructor(loader: GitLabYAMLLoader, node: yaml.nodes.Node) -> Gi
         refs = loader.construct_sequence(node)
         return GitLabReference(refs)
     # Single reference
-    value = loader.construct_scalar(node)
+    value = loader.construct_scalar(node)  # type: ignore[arg-type]
     return GitLabReference([value])
 
 
@@ -75,7 +75,7 @@ def generic_tag_constructor(loader: GitLabYAMLLoader, suffix: str, node: yaml.no
 
 
 # Add support for unknown tags (multi-constructor)
-GitLabYAMLLoader.add_multi_constructor("!", generic_tag_constructor)
+GitLabYAMLLoader.add_multi_constructor("!", generic_tag_constructor)  # type: ignore[no-untyped-call]
 
 
 def resolve_references(data: Any, root: dict[str, Any]) -> Any:
@@ -129,7 +129,7 @@ def parse_gitlab_yaml(yaml_content: str, resolve_refs: bool = True) -> dict[str,
         # Resolve all references
         data = resolve_references(data, data)
 
-    return data
+    return data  # type: ignore[no-any-return]
 
 
 def safe_load_gitlab_yaml(yaml_content: str, resolve_refs: bool = True) -> dict[str, Any]:
@@ -147,7 +147,7 @@ def safe_load_gitlab_yaml(yaml_content: str, resolve_refs: bool = True) -> dict[
     return parse_gitlab_yaml(yaml_content, resolve_refs=resolve_refs)
 
 
-def dump_gitlab_yaml(data: dict[str, Any], stream=None, **kwargs) -> str:
+def dump_gitlab_yaml(data: dict[str, Any], stream: Any = None, **kwargs: Any) -> str:
     """Dump data to YAML with GitLab CI specific tag support.
 
     Args:
@@ -161,10 +161,10 @@ def dump_gitlab_yaml(data: dict[str, Any], stream=None, **kwargs) -> str:
     kwargs.setdefault("Dumper", GitLabYAMLDumper)
     kwargs.setdefault("default_flow_style", False)
     kwargs.setdefault("sort_keys", False)
-    return yaml.dump(data, stream=stream, **kwargs)
+    return yaml.dump(data, stream=stream, **kwargs)  # type: ignore[no-any-return]
 
 
-def safe_dump_gitlab_yaml(data: dict[str, Any], stream=None, **kwargs) -> str:
+def safe_dump_gitlab_yaml(data: dict[str, Any], stream: Any = None, **kwargs: Any) -> str:
     """Safely dump data to YAML with GitLab CI specific tag support.
 
     This is an alias for dump_gitlab_yaml for consistency with yaml.safe_dump.

@@ -29,6 +29,25 @@ class GitLabCIBaseModel(BaseModel):
             if extra:
                 self.extra_fields = extra
 
+    @classmethod
+    def _handle_gitlab_reference(cls, v: Any) -> Any:
+        """Handle GitLabReference objects in validators.
+
+        This is a helper method for validators to handle GitLabReference objects.
+        Import is done inside the method to avoid circular imports.
+
+        Returns the value as-is if it contains GitLabReference, otherwise None.
+        """
+        from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+        if isinstance(v, GitLabReference):
+            return v
+        if isinstance(v, dict) and any(isinstance(val, GitLabReference) for val in v.values()):
+            return v
+        if isinstance(v, list) and any(isinstance(item, GitLabReference) for item in v):
+            return v
+        return None
+
 
 class WhenType(str, Enum):
     """When to run job."""

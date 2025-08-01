@@ -142,7 +142,7 @@ class GitLabCIJob(GitLabCIBaseModel):
     """GitLab CI job configuration."""
 
     # Core job definition
-    script: Optional[list[str]] = None
+    script: Optional[list[Union[str, Any]]] = None
     run: Optional[list[str]] = None  # Alternative to script
     extends: Optional[Union[str, list[str]]] = None
     stage: Optional[StageName] = None
@@ -150,7 +150,7 @@ class GitLabCIJob(GitLabCIBaseModel):
     except_: Optional[Any] = Field(None, alias="except")  # Deprecated but still used
 
     # Job control
-    rules: Optional[list[GitLabCIRule]] = None
+    rules: Optional[Union[list[GitLabCIRule], Any]] = None
     when: Optional[WhenType] = None
     allow_failure: Optional[Union[bool, dict[str, list[int]]]] = Field(None, alias="allow_failure")
     manual_confirmation: Optional[str] = Field(None, alias="manual_confirmation")
@@ -160,8 +160,8 @@ class GitLabCIJob(GitLabCIBaseModel):
     interruptible: Optional[bool] = None
 
     # Scripts and hooks
-    before_script: Optional[list[str]] = Field(None, alias="before_script")
-    after_script: Optional[list[str]] = Field(None, alias="after_script")
+    before_script: Optional[list[Union[str, Any]]] = Field(None, alias="before_script")
+    after_script: Optional[list[Union[str, Any]]] = Field(None, alias="after_script")
     hooks: Optional[GitLabCIJobHooks] = None
 
     # Dependencies and artifacts
@@ -181,7 +181,7 @@ class GitLabCIJob(GitLabCIBaseModel):
     cache: Optional[Union[GitLabCICache, list[GitLabCICache]]] = None
 
     # Variables
-    variables: Optional[Union[dict[VariableName, VariableValue], GitLabCIJobVariables]] = None
+    variables: Optional[Union[dict[VariableName, VariableValue], GitLabCIJobVariables, Any]] = None
 
     # Runner configuration
     tags: Optional[list[str]] = None
@@ -214,6 +214,13 @@ class GitLabCIJob(GitLabCIBaseModel):
         if isinstance(v, str):
             return [v]
         if isinstance(v, list):
+            # Check if list contains GitLabReference objects
+            # Import here to avoid circular import
+            from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+            if any(isinstance(item, GitLabReference) for item in v):
+                # Keep GitLabReference objects as is - they should be resolved during YAML parsing
+                return v
             return v
         raise ValueError(f"Invalid value: {v}")
 
@@ -250,6 +257,13 @@ class GitLabCIJob(GitLabCIBaseModel):
         if isinstance(v, str):
             return [v]
         if isinstance(v, list):
+            # Check if list contains GitLabReference objects
+            # Import here to avoid circular import
+            from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+            if any(isinstance(item, GitLabReference) for item in v):
+                # Keep GitLabReference objects as is - they should be resolved during YAML parsing
+                return v
             return v
         raise ValueError(f"Invalid value: {v}")
 
@@ -262,6 +276,13 @@ class GitLabCIJob(GitLabCIBaseModel):
         if isinstance(v, str):
             return [v]
         if isinstance(v, list):
+            # Check if list contains GitLabReference objects
+            # Import here to avoid circular import
+            from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+            if any(isinstance(item, GitLabReference) for item in v):
+                # Keep GitLabReference objects as is - they should be resolved during YAML parsing
+                return v
             return v
         raise ValueError(f"Invalid value: {v}")
 
@@ -295,9 +316,19 @@ class GitLabCIJob(GitLabCIBaseModel):
         """Normalize rules to list of GitLabCIRule."""
         if v is None:
             return None
+        # Check if it's a GitLabReference
+        from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+        if isinstance(v, GitLabReference):
+            # Keep GitLabReference objects as is
+            return v
         if isinstance(v, dict):
             return [GitLabCIRule(**v)]
         if isinstance(v, list):
+            # Check if list contains GitLabReference objects
+            if any(isinstance(item, GitLabReference) for item in v):
+                # Keep list with GitLabReference objects as is
+                return v
             return [GitLabCIRule(**rule) if isinstance(rule, dict) else rule for rule in v]
         raise ValueError(f"Invalid rules value: {v}")
 
@@ -375,9 +406,19 @@ class GitLabCIJob(GitLabCIBaseModel):
         """Parse variables field."""
         if v is None:
             return None
+        # Check if it's a GitLabReference
+        from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+        if isinstance(v, GitLabReference):
+            # Keep GitLabReference objects as is
+            return v
         if isinstance(v, GitLabCIJobVariables):
             return v
         if isinstance(v, dict):
+            # Check if dict contains GitLabReference values
+            if any(isinstance(val, GitLabReference) for val in v.values()):
+                # Keep dict with GitLabReference values as is
+                return v
             return GitLabCIJobVariables(**v)
         raise ValueError(f"Invalid variables value: {v}")
 

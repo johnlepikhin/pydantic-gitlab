@@ -33,9 +33,9 @@ class GitLabCIIdToken(GitLabCIBaseModel):
 class GitLabCIDefault(GitLabCIBaseModel):
     """Default configuration for all jobs."""
 
-    after_script: Optional[list[str]] = Field(None, alias="after_script")
+    after_script: Optional[list[Union[str, Any]]] = Field(None, alias="after_script")
     artifacts: Optional[GitLabCIArtifacts] = None
-    before_script: Optional[list[str]] = Field(None, alias="before_script")
+    before_script: Optional[list[Union[str, Any]]] = Field(None, alias="before_script")
     cache: Optional[Union[GitLabCICache, list[GitLabCICache]]] = None
     hooks: Optional[GitLabCIJobHooks] = None
     id_tokens: Optional[dict[str, GitLabCIIdToken]] = Field(None, alias="id_tokens")
@@ -55,6 +55,13 @@ class GitLabCIDefault(GitLabCIBaseModel):
         if isinstance(v, str):
             return [v]
         if isinstance(v, list):
+            # Check if list contains GitLabReference objects
+            # Import here to avoid circular import
+            from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+            if any(isinstance(item, GitLabReference) for item in v):
+                # Keep GitLabReference objects as is - they should be resolved during YAML parsing
+                return v
             return v
         raise ValueError(f"Invalid value: {v}")
 
@@ -67,6 +74,13 @@ class GitLabCIDefault(GitLabCIBaseModel):
         if isinstance(v, str):
             return [v]
         if isinstance(v, list):
+            # Check if list contains GitLabReference objects
+            # Import here to avoid circular import
+            from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+            if any(isinstance(item, GitLabReference) for item in v):
+                # Keep GitLabReference objects as is - they should be resolved during YAML parsing
+                return v
             return v
         raise ValueError(f"Invalid value: {v}")
 

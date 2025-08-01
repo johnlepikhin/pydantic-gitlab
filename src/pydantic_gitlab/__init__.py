@@ -37,7 +37,12 @@ from .needs import GitLabCINeeds, GitLabCINeedsObject
 from .pages import GitLabCIPages, GitLabCIPagesConfig
 from .parallel import GitLabCIParallel, GitLabCIParallelMatrix, GitLabCIParallelObject
 from .retry import GitLabCIRetry, GitLabCIRetryObject
-from .rules import GitLabCIRule, GitLabCIRulesChanges, GitLabCIRulesExists, GitLabCIRulesIf
+from .rules import (
+    GitLabCIRule,
+    GitLabCIRulesChanges,
+    GitLabCIRulesExists,
+    GitLabCIRulesIf,
+)
 from .services import (
     GitLabCIDockerConfig,
     GitLabCIImage,
@@ -55,8 +60,15 @@ from .workflow import (
     GitLabCIWorkflowRule,
     GitLabCIWorkflowRuleAutoCancel,
 )
+from .yaml_parser import (
+    GitLabReference,
+    dump_gitlab_yaml,
+    parse_gitlab_yaml,
+    safe_dump_gitlab_yaml,
+    safe_load_gitlab_yaml,
+)
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "ArtifactAccessType",
@@ -117,10 +129,15 @@ __all__ = [
     "GitLabCIWorkflowAutoCancel",
     "GitLabCIWorkflowRule",
     "GitLabCIWorkflowRuleAutoCancel",
+    "GitLabReference",
     "GitStrategyType",
     "InputType",
     "PolicyType",
     "StageType",
     "WhenType",
     "__version__",
+    "dump_gitlab_yaml",
+    "parse_gitlab_yaml",
+    "safe_dump_gitlab_yaml",
+    "safe_load_gitlab_yaml",
 ]

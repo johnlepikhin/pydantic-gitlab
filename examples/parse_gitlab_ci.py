@@ -2,7 +2,7 @@
 
 import yaml
 
-from pydantic_gitlab import GitLabCI
+from pydantic_gitlab import GitLabCI, safe_load_gitlab_yaml
 
 
 def print_job_info(job_name, job):
@@ -127,8 +127,8 @@ pages:
     - main
 """
 
-    # Parse YAML
-    data = yaml.safe_load(gitlab_ci_yaml)
+    # Parse YAML with GitLab CI specific tags support
+    data = safe_load_gitlab_yaml(gitlab_ci_yaml)
 
     # Create and validate GitLabCI structure
     try:

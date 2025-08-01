@@ -169,7 +169,6 @@ class TestGitLabCIServiceObject:
         assert service.name == "elasticsearch:7.10"
         assert service.pull_policy == "if-not-present"
 
-
     def test_service_object_complete(self):
         """Test complete service object."""
         service = GitLabCIServiceObject(

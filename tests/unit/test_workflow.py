@@ -1,6 +1,5 @@
 """Tests for GitLab CI workflow structures."""
 
-
 from pydantic_gitlab.workflow import (
     GitLabCIWorkflow,
     GitLabCIWorkflowAutoCancel,

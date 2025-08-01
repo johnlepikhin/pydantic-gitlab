@@ -5,6 +5,24 @@ import yaml
 from pydantic_gitlab import GitLabCI
 
 
+def print_job_info(job_name, job):
+    """Print information about a job."""
+    print(f"  - {job_name}")
+    print(f"    Stage: {job.stage or 'test'}")
+    if job.script:
+        print(f"    Script: {job.script[0]}{'...' if len(job.script) > 1 else ''}")
+    if job.when:
+        print(f"    When: {job.when.value}")
+    if job.environment:
+        print(f"    Environment: {job.environment.name}")
+    if job.parallel:
+        print(f"    Parallel: {job.parallel}")
+    if job.needs:
+        needs_str = ", ".join(n if isinstance(n, str) else n.job for n in job.needs)
+        print(f"    Needs: {needs_str}")
+    print()
+
+
 def main():
     """Parse and validate a GitLab CI configuration."""
     # Example GitLab CI YAML content
@@ -132,23 +150,7 @@ pages:
 
         print("👷 Jobs:")
         for job_name, job in ci_config.jobs.items():
-            print(f"  - {job_name}")
-            print(f"    Stage: {job.stage or 'test'}")
-            if job.script:
-                print(f"    Script: {job.script[0]}{'...' if len(job.script) > 1 else ''}")
-            if job.when:
-                print(f"    When: {job.when.value}")
-            if job.environment:
-                print(f"    Environment: {job.environment.name}")
-            if job.parallel:
-                print(f"    Parallel: {job.parallel}")
-            if job.needs:
-                needs_str = ", ".join(
-                    n if isinstance(n, str) else n.job
-                    for n in job.needs
-                )
-                print(f"    Needs: {needs_str}")
-            print()
+            print_job_info(job_name, job)
 
         # Validate job dependencies
         errors = ci_config.validate_job_dependencies()

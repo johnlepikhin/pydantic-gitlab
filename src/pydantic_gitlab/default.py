@@ -1,6 +1,6 @@
 """Default configuration for GitLab CI."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import Field, field_validator
 
@@ -15,11 +15,11 @@ from .services import GitLabCIImage, GitLabCIService, parse_image, parse_service
 class GitLabCIIdToken(GitLabCIBaseModel):
     """ID token configuration."""
 
-    aud: Optional[Union[str, List[str]]] = None
+    aud: Optional[Union[str, list[str]]] = None
 
     @field_validator("aud", mode="before")
     @classmethod
-    def normalize_aud(cls, v: Any) -> Optional[List[str]]:
+    def normalize_aud(cls, v: Any) -> Optional[list[str]]:
         """Normalize audience to list."""
         if v is None:
             return None
@@ -33,22 +33,22 @@ class GitLabCIIdToken(GitLabCIBaseModel):
 class GitLabCIDefault(GitLabCIBaseModel):
     """Default configuration for all jobs."""
 
-    after_script: Optional[List[str]] = Field(None, alias="after_script")
+    after_script: Optional[list[str]] = Field(None, alias="after_script")
     artifacts: Optional[GitLabCIArtifacts] = None
-    before_script: Optional[List[str]] = Field(None, alias="before_script")
-    cache: Optional[Union[GitLabCICache, List[GitLabCICache]]] = None
+    before_script: Optional[list[str]] = Field(None, alias="before_script")
+    cache: Optional[Union[GitLabCICache, list[GitLabCICache]]] = None
     hooks: Optional[GitLabCIJobHooks] = None
-    id_tokens: Optional[Dict[str, GitLabCIIdToken]] = Field(None, alias="id_tokens")
+    id_tokens: Optional[dict[str, GitLabCIIdToken]] = Field(None, alias="id_tokens")
     image: Optional[GitLabCIImage] = None
     interruptible: Optional[bool] = None
     retry: Optional[GitLabCIRetry] = None
-    services: Optional[List[GitLabCIService]] = None
-    tags: Optional[List[str]] = None
+    services: Optional[list[GitLabCIService]] = None
+    tags: Optional[list[str]] = None
     timeout: Optional[Duration] = None
 
     @field_validator("after_script", mode="before")
     @classmethod
-    def normalize_after_script(cls, v: Any) -> Optional[List[str]]:
+    def normalize_after_script(cls, v: Any) -> Optional[list[str]]:
         """Normalize after_script to list."""
         if v is None:
             return None
@@ -60,7 +60,7 @@ class GitLabCIDefault(GitLabCIBaseModel):
 
     @field_validator("before_script", mode="before")
     @classmethod
-    def normalize_before_script(cls, v: Any) -> Optional[List[str]]:
+    def normalize_before_script(cls, v: Any) -> Optional[list[str]]:
         """Normalize before_script to list."""
         if v is None:
             return None
@@ -72,7 +72,7 @@ class GitLabCIDefault(GitLabCIBaseModel):
 
     @field_validator("cache", mode="before")
     @classmethod
-    def parse_cache_field(cls, v: Any) -> Optional[Union[GitLabCICache, List[GitLabCICache]]]:
+    def parse_cache_field(cls, v: Any) -> Optional[Union[GitLabCICache, list[GitLabCICache]]]:
         """Parse cache field."""
         if v is None:
             return None
@@ -100,7 +100,7 @@ class GitLabCIDefault(GitLabCIBaseModel):
 
     @field_validator("services", mode="before")
     @classmethod
-    def parse_services_field(cls, v: Any) -> Optional[List[GitLabCIService]]:
+    def parse_services_field(cls, v: Any) -> Optional[list[GitLabCIService]]:
         """Parse services field."""
         if v is None:
             return None
@@ -108,7 +108,7 @@ class GitLabCIDefault(GitLabCIBaseModel):
 
     @field_validator("tags", mode="before")
     @classmethod
-    def normalize_tags(cls, v: Any) -> Optional[List[str]]:
+    def normalize_tags(cls, v: Any) -> Optional[list[str]]:
         """Normalize tags to list."""
         if v is None:
             return None
@@ -120,7 +120,7 @@ class GitLabCIDefault(GitLabCIBaseModel):
 
     @field_validator("id_tokens", mode="before")
     @classmethod
-    def parse_id_tokens(cls, v: Any) -> Optional[Dict[str, GitLabCIIdToken]]:
+    def parse_id_tokens(cls, v: Any) -> Optional[dict[str, GitLabCIIdToken]]:
         """Parse id_tokens configuration."""
         if v is None:
             return None

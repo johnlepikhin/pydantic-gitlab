@@ -1,6 +1,6 @@
 """Job structure for GitLab CI configuration."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import Field, field_validator
 
@@ -30,7 +30,7 @@ class GitLabCIJobVariables(GitLabCIBaseModel):
     """Job-level variables configuration."""
 
     # Simple key-value pairs
-    variables: Dict[VariableName, VariableValue] = Field(default_factory=dict)
+    variables: dict[VariableName, VariableValue] = Field(default_factory=dict)
 
     def __init__(self, **data: Any) -> None:
         """Initialize with dynamic variables."""
@@ -63,11 +63,11 @@ class GitLabCIJobVariables(GitLabCIBaseModel):
 class GitLabCIJobHooks(GitLabCIBaseModel):
     """Job hooks configuration."""
 
-    pre_get_sources_script: Optional[List[str]] = Field(None, alias="pre_get_sources_script")
+    pre_get_sources_script: Optional[list[str]] = Field(None, alias="pre_get_sources_script")
 
     @field_validator("pre_get_sources_script", mode="before")
     @classmethod
-    def normalize_script(cls, v: Any) -> Optional[List[str]]:
+    def normalize_script(cls, v: Any) -> Optional[list[str]]:
         """Normalize script to list."""
         if v is None:
             return None
@@ -81,12 +81,12 @@ class GitLabCIJobHooks(GitLabCIBaseModel):
 class GitLabCIJobInherit(GitLabCIBaseModel):
     """Job inherit configuration."""
 
-    default: Optional[Union[bool, List[str]]] = None
-    variables: Optional[Union[bool, List[VariableName]]] = None
+    default: Optional[Union[bool, list[str]]] = None
+    variables: Optional[Union[bool, list[VariableName]]] = None
 
     @field_validator("default", mode="before")
     @classmethod
-    def normalize_default(cls, v: Any) -> Optional[Union[bool, List[str]]]:
+    def normalize_default(cls, v: Any) -> Optional[Union[bool, list[str]]]:
         """Normalize default inheritance."""
         if v is None or isinstance(v, bool):
             return v
@@ -96,7 +96,7 @@ class GitLabCIJobInherit(GitLabCIBaseModel):
 
     @field_validator("variables", mode="before")
     @classmethod
-    def normalize_variables(cls, v: Any) -> Optional[Union[bool, List[str]]]:
+    def normalize_variables(cls, v: Any) -> Optional[Union[bool, list[str]]]:
         """Normalize variables inheritance."""
         if v is None or isinstance(v, bool):
             return v
@@ -113,9 +113,9 @@ class GitLabCIJobRelease(GitLabCIBaseModel):
     tag_message: Optional[str] = Field(None, alias="tag_message")
     name: Optional[str] = None
     ref: Optional[str] = None
-    milestones: Optional[List[str]] = None
+    milestones: Optional[list[str]] = None
     released_at: Optional[str] = Field(None, alias="released_at")
-    assets: Optional[Dict[str, Any]] = None
+    assets: Optional[dict[str, Any]] = None
 
 
 class GitLabCIJobDastConfiguration(GitLabCIBaseModel):
@@ -130,7 +130,7 @@ class GitLabCIJobIdentity(GitLabCIBaseModel):
 
     # Identity configuration is provider-specific
     # Keeping it flexible as Dict for now
-    config: Dict[str, Any] = Field(default_factory=dict)
+    config: dict[str, Any] = Field(default_factory=dict)
 
     def __init__(self, **data: Any) -> None:
         """Initialize with provider-specific config."""
@@ -142,17 +142,17 @@ class GitLabCIJob(GitLabCIBaseModel):
     """GitLab CI job configuration."""
 
     # Core job definition
-    script: Optional[List[str]] = None
-    run: Optional[List[str]] = None  # Alternative to script
-    extends: Optional[Union[str, List[str]]] = None
+    script: Optional[list[str]] = None
+    run: Optional[list[str]] = None  # Alternative to script
+    extends: Optional[Union[str, list[str]]] = None
     stage: Optional[StageName] = None
     only: Optional[Any] = None  # Deprecated but still used
     except_: Optional[Any] = Field(None, alias="except")  # Deprecated but still used
 
     # Job control
-    rules: Optional[List[GitLabCIRule]] = None
+    rules: Optional[list[GitLabCIRule]] = None
     when: Optional[WhenType] = None
-    allow_failure: Optional[Union[bool, Dict[str, List[int]]]] = Field(None, alias="allow_failure")
+    allow_failure: Optional[Union[bool, dict[str, list[int]]]] = Field(None, alias="allow_failure")
     manual_confirmation: Optional[str] = Field(None, alias="manual_confirmation")
     start_in: Optional[Duration] = Field(None, alias="start_in")  # For delayed jobs
     timeout: Optional[Duration] = None
@@ -160,13 +160,13 @@ class GitLabCIJob(GitLabCIBaseModel):
     interruptible: Optional[bool] = None
 
     # Scripts and hooks
-    before_script: Optional[List[str]] = Field(None, alias="before_script")
-    after_script: Optional[List[str]] = Field(None, alias="after_script")
+    before_script: Optional[list[str]] = Field(None, alias="before_script")
+    after_script: Optional[list[str]] = Field(None, alias="after_script")
     hooks: Optional[GitLabCIJobHooks] = None
 
     # Dependencies and artifacts
-    needs: Optional[List[GitLabCINeeds]] = None
-    dependencies: Optional[List[JobName]] = None
+    needs: Optional[list[GitLabCINeeds]] = None
+    dependencies: Optional[list[JobName]] = None
     artifacts: Optional[GitLabCIArtifacts] = None
 
     # Environment and deployment
@@ -175,21 +175,21 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     # Docker configuration
     image: Optional[GitLabCIImage] = None
-    services: Optional[List[GitLabCIService]] = None
+    services: Optional[list[GitLabCIService]] = None
 
     # Caching
-    cache: Optional[Union[GitLabCICache, List[GitLabCICache]]] = None
+    cache: Optional[Union[GitLabCICache, list[GitLabCICache]]] = None
 
     # Variables
-    variables: Optional[Union[Dict[VariableName, VariableValue], GitLabCIJobVariables]] = None
+    variables: Optional[Union[dict[VariableName, VariableValue], GitLabCIJobVariables]] = None
 
     # Runner configuration
-    tags: Optional[List[str]] = None
+    tags: Optional[list[str]] = None
 
     # Git configuration
     git_strategy: Optional[GitStrategyType] = Field(None, alias="git_strategy")
     git_submodule_strategy: Optional[str] = Field(None, alias="git_submodule_strategy")
-    git_submodule_paths: Optional[List[str]] = Field(None, alias="git_submodule_paths")
+    git_submodule_paths: Optional[list[str]] = Field(None, alias="git_submodule_paths")
     git_depth: Optional[int] = Field(None, alias="git_depth")
     git_clean_flags: Optional[str] = Field(None, alias="git_clean_flags")
 
@@ -203,11 +203,11 @@ class GitLabCIJob(GitLabCIBaseModel):
     identity: Optional[GitLabCIJobIdentity] = None
 
     # Pages-specific
-    pages: Optional[Dict[str, Any]] = None  # For pages jobs
+    pages: Optional[dict[str, Any]] = None  # For pages jobs
 
     @field_validator("script", mode="before")
     @classmethod
-    def normalize_script(cls, v: Any) -> Optional[List[str]]:
+    def normalize_script(cls, v: Any) -> Optional[list[str]]:
         """Normalize script to list."""
         if v is None:
             return None
@@ -219,7 +219,7 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("run", mode="before")
     @classmethod
-    def normalize_run(cls, v: Any) -> Optional[List[str]]:
+    def normalize_run(cls, v: Any) -> Optional[list[str]]:
         """Normalize run to list."""
         if v is None:
             return None
@@ -231,7 +231,7 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("extends", mode="before")
     @classmethod
-    def normalize_extends(cls, v: Any) -> Optional[List[str]]:
+    def normalize_extends(cls, v: Any) -> Optional[list[str]]:
         """Normalize extends to list."""
         if v is None:
             return None
@@ -243,7 +243,7 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("before_script", mode="before")
     @classmethod
-    def normalize_before_script(cls, v: Any) -> Optional[List[str]]:
+    def normalize_before_script(cls, v: Any) -> Optional[list[str]]:
         """Normalize before_script to list."""
         if v is None:
             return None
@@ -255,7 +255,7 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("after_script", mode="before")
     @classmethod
-    def normalize_after_script(cls, v: Any) -> Optional[List[str]]:
+    def normalize_after_script(cls, v: Any) -> Optional[list[str]]:
         """Normalize after_script to list."""
         if v is None:
             return None
@@ -267,7 +267,7 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("tags", mode="before")
     @classmethod
-    def normalize_tags(cls, v: Any) -> Optional[List[str]]:
+    def normalize_tags(cls, v: Any) -> Optional[list[str]]:
         """Normalize tags to list."""
         if v is None:
             return None
@@ -279,7 +279,7 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("dependencies", mode="before")
     @classmethod
-    def normalize_dependencies(cls, v: Any) -> Optional[List[str]]:
+    def normalize_dependencies(cls, v: Any) -> Optional[list[str]]:
         """Normalize dependencies to list."""
         if v is None:
             return None
@@ -291,7 +291,7 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("rules", mode="before")
     @classmethod
-    def normalize_rules(cls, v: Any) -> Optional[List[GitLabCIRule]]:
+    def normalize_rules(cls, v: Any) -> Optional[list[GitLabCIRule]]:
         """Normalize rules to list of GitLabCIRule."""
         if v is None:
             return None
@@ -303,7 +303,7 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("needs", mode="before")
     @classmethod
-    def parse_needs_field(cls, v: Any) -> Optional[List[GitLabCINeeds]]:
+    def parse_needs_field(cls, v: Any) -> Optional[list[GitLabCINeeds]]:
         """Parse needs field."""
         if v is None:
             return None
@@ -327,7 +327,7 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("services", mode="before")
     @classmethod
-    def parse_services_field(cls, v: Any) -> Optional[List[GitLabCIService]]:
+    def parse_services_field(cls, v: Any) -> Optional[list[GitLabCIService]]:
         """Parse services field."""
         if v is None:
             return None
@@ -335,7 +335,7 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("cache", mode="before")
     @classmethod
-    def parse_cache_field(cls, v: Any) -> Optional[Union[GitLabCICache, List[GitLabCICache]]]:
+    def parse_cache_field(cls, v: Any) -> Optional[Union[GitLabCICache, list[GitLabCICache]]]:
         """Parse cache field."""
         if v is None:
             return None

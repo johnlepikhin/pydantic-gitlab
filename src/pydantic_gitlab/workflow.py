@@ -1,6 +1,6 @@
 """Workflow structures for GitLab CI configuration."""
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import Field, field_validator
 
@@ -64,12 +64,12 @@ class GitLabCIWorkflow(GitLabCIBaseModel):
     """Workflow configuration."""
 
     name: Optional[str] = None
-    rules: Optional[List[GitLabCIWorkflowRule]] = None
+    rules: Optional[list[GitLabCIWorkflowRule]] = None
     auto_cancel: Optional[GitLabCIWorkflowAutoCancel] = Field(None, alias="auto_cancel")
 
     @field_validator("rules", mode="before")
     @classmethod
-    def normalize_rules(cls, v: Any) -> Optional[List[GitLabCIWorkflowRule]]:
+    def normalize_rules(cls, v: Any) -> Optional[list[GitLabCIWorkflowRule]]:
         """Normalize rules to list of GitLabCIWorkflowRule."""
         if v is None:
             return None

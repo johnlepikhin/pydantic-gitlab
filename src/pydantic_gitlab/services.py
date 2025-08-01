@@ -1,6 +1,6 @@
 """Services and image structures for GitLab CI configuration."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import Field, field_validator
 
@@ -17,11 +17,11 @@ class GitLabCIDockerConfig(GitLabCIBaseModel):
 class GitLabCIPullPolicy(GitLabCIBaseModel):
     """Pull policy configuration for image."""
 
-    policy: Optional[Union[str, List[str]]] = None
+    policy: Optional[Union[str, list[str]]] = None
 
     @field_validator("policy", mode="before")
     @classmethod
-    def normalize_policy(cls, v: Any) -> Optional[List[str]]:
+    def normalize_policy(cls, v: Any) -> Optional[list[str]]:
         """Normalize policy to list."""
         if v is None:
             return None
@@ -36,13 +36,13 @@ class GitLabCIImageObject(GitLabCIBaseModel):
     """Image configuration object."""
 
     name: ImageName
-    entrypoint: Optional[List[str]] = None
+    entrypoint: Optional[list[str]] = None
     docker: Optional[GitLabCIDockerConfig] = None
-    pull_policy: Optional[Union[str, List[str], GitLabCIPullPolicy]] = Field(None, alias="pull_policy")
+    pull_policy: Optional[Union[str, list[str], GitLabCIPullPolicy]] = Field(None, alias="pull_policy")
 
     @field_validator("entrypoint", mode="before")
     @classmethod
-    def normalize_entrypoint(cls, v: Any) -> Optional[List[str]]:
+    def normalize_entrypoint(cls, v: Any) -> Optional[list[str]]:
         """Normalize entrypoint to list."""
         if v is None:
             return None
@@ -54,7 +54,7 @@ class GitLabCIImageObject(GitLabCIBaseModel):
 
     @field_validator("pull_policy", mode="before")
     @classmethod
-    def parse_pull_policy(cls, v: Any) -> Optional[Union[str, List[str], GitLabCIPullPolicy]]:
+    def parse_pull_policy(cls, v: Any) -> Optional[Union[str, list[str], GitLabCIPullPolicy]]:
         """Parse pull policy."""
         if v is None:
             return None
@@ -72,14 +72,14 @@ class GitLabCIServiceObject(GitLabCIBaseModel):
 
     name: ServiceName
     alias: Optional[str] = None
-    entrypoint: Optional[List[str]] = None
-    command: Optional[List[str]] = None
-    variables: Optional[Dict[VariableName, VariableValue]] = None
-    pull_policy: Optional[Union[str, List[str], GitLabCIPullPolicy]] = Field(None, alias="pull_policy")
+    entrypoint: Optional[list[str]] = None
+    command: Optional[list[str]] = None
+    variables: Optional[dict[VariableName, VariableValue]] = None
+    pull_policy: Optional[Union[str, list[str], GitLabCIPullPolicy]] = Field(None, alias="pull_policy")
 
     @field_validator("entrypoint", mode="before")
     @classmethod
-    def normalize_entrypoint(cls, v: Any) -> Optional[List[str]]:
+    def normalize_entrypoint(cls, v: Any) -> Optional[list[str]]:
         """Normalize entrypoint to list."""
         if v is None:
             return None
@@ -91,7 +91,7 @@ class GitLabCIServiceObject(GitLabCIBaseModel):
 
     @field_validator("command", mode="before")
     @classmethod
-    def normalize_command(cls, v: Any) -> Optional[List[str]]:
+    def normalize_command(cls, v: Any) -> Optional[list[str]]:
         """Normalize command to list."""
         if v is None:
             return None
@@ -103,7 +103,7 @@ class GitLabCIServiceObject(GitLabCIBaseModel):
 
     @field_validator("pull_policy", mode="before")
     @classmethod
-    def parse_pull_policy(cls, v: Any) -> Optional[Union[str, List[str], GitLabCIPullPolicy]]:
+    def parse_pull_policy(cls, v: Any) -> Optional[Union[str, list[str], GitLabCIPullPolicy]]:
         """Parse pull policy."""
         if v is None:
             return None
@@ -121,7 +121,7 @@ GitLabCIImage = Union[ImageName, GitLabCIImageObject]
 GitLabCIService = Union[ServiceName, GitLabCIServiceObject]
 
 
-def parse_image(value: Union[str, Dict[str, Any]]) -> GitLabCIImage:
+def parse_image(value: Union[str, dict[str, Any]]) -> GitLabCIImage:
     """Parse image configuration from various input formats."""
     if isinstance(value, str):
         return value
@@ -130,7 +130,7 @@ def parse_image(value: Union[str, Dict[str, Any]]) -> GitLabCIImage:
     raise ValueError(f"Invalid image configuration: {value}")
 
 
-def parse_service(value: Union[str, Dict[str, Any]]) -> GitLabCIService:
+def parse_service(value: Union[str, dict[str, Any]]) -> GitLabCIService:
     """Parse service configuration from various input formats."""
     if isinstance(value, str):
         return value
@@ -139,7 +139,7 @@ def parse_service(value: Union[str, Dict[str, Any]]) -> GitLabCIService:
     raise ValueError(f"Invalid service configuration: {value}")
 
 
-def parse_services(value: Union[str, List[Any], Dict[str, Any]]) -> List[GitLabCIService]:
+def parse_services(value: Union[str, list[Any], dict[str, Any]]) -> list[GitLabCIService]:
     """Parse services configuration from various input formats."""
     if isinstance(value, str):
         return [value]

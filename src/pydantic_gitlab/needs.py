@@ -1,6 +1,6 @@
 """Needs structures for GitLab CI configuration."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from .base import GitLabCIBaseModel, GitRef, JobName
 
@@ -32,14 +32,14 @@ class GitLabCINeedsObject(GitLabCIBaseModel):
 GitLabCINeeds = Union[JobName, GitLabCINeedsObject]
 
 
-def parse_needs(value: Union[str, Dict[str, Any], List[Any]]) -> List[GitLabCINeeds]:
+def parse_needs(value: Union[str, dict[str, Any], list[Any]]) -> list[GitLabCINeeds]:
     """Parse needs configuration from various input formats."""
     if isinstance(value, str):
         return [value]
     if isinstance(value, dict):
         return [GitLabCINeedsObject(**value)]
     if isinstance(value, list):
-        result: List[GitLabCINeeds] = []
+        result: list[GitLabCINeeds] = []
         for item in value:
             if isinstance(item, str):
                 result.append(item)

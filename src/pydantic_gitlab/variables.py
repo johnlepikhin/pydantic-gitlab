@@ -1,6 +1,6 @@
 """Variables structures for GitLab CI configuration."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import Field, field_validator
 
@@ -13,11 +13,11 @@ class GitLabCIVariableObject(GitLabCIBaseModel):
     value: VariableValue
     description: Optional[str] = None
     expand: Optional[bool] = None
-    options: Optional[List[str]] = None
+    options: Optional[list[str]] = None
 
     @field_validator("options")
     @classmethod
-    def validate_options(cls, v: Optional[List[str]]) -> Optional[List[str]]:
+    def validate_options(cls, v: Optional[list[str]]) -> Optional[list[str]]:
         """Validate options list."""
         if v is not None and len(v) > 50:
             raise ValueError("Variable can have maximum 50 options")
@@ -32,12 +32,12 @@ class GitLabCIVariables(GitLabCIBaseModel):
     """Top-level variables configuration."""
 
     # Store variables as dict
-    variables: Dict[VariableName, GitLabCIVariable] = Field(default_factory=dict)
+    variables: dict[VariableName, GitLabCIVariable] = Field(default_factory=dict)
 
     def __init__(self, **data: Any) -> None:
         """Initialize with variables."""
         # Parse each variable
-        parsed_vars: Dict[str, GitLabCIVariable] = {}
+        parsed_vars: dict[str, GitLabCIVariable] = {}
         for key, value in data.items():
             if value is None:
                 # Skip None values
@@ -93,10 +93,10 @@ class GitLabCIVariables(GitLabCIBaseModel):
             else:
                 raise ValueError(f"Invalid variable value type: {type(value)}")
 
-    def model_dump(self, **kwargs: Any) -> Dict[str, Any]:
+    def model_dump(self, **kwargs: Any) -> dict[str, Any]:
         """Custom serialization to flatten variables."""
         # Return the variables dict directly, not wrapped
-        result: Dict[str, Any] = {}
+        result: dict[str, Any] = {}
         for key, value in self.variables.items():
             if isinstance(value, GitLabCIVariableObject):
                 # Convert object to dict

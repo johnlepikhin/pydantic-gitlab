@@ -1,6 +1,6 @@
 """Retry structures for GitLab CI configuration."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import field_validator
 
@@ -11,7 +11,7 @@ class GitLabCIRetryObject(GitLabCIBaseModel):
     """Retry configuration object."""
 
     max: Optional[int] = None  # 0, 1, or 2
-    when: Optional[Union[str, List[str]]] = None  # Retry conditions
+    when: Optional[Union[str, list[str]]] = None  # Retry conditions
 
     @field_validator("max")
     @classmethod
@@ -23,7 +23,7 @@ class GitLabCIRetryObject(GitLabCIBaseModel):
 
     @field_validator("when", mode="before")
     @classmethod
-    def normalize_when(cls, v: Any) -> Optional[List[str]]:
+    def normalize_when(cls, v: Any) -> Optional[list[str]]:
         """Normalize when to list."""
         if v is None:
             return None
@@ -38,7 +38,7 @@ class GitLabCIRetryObject(GitLabCIBaseModel):
 GitLabCIRetry = Union[int, GitLabCIRetryObject]
 
 
-def parse_retry(value: Union[int, Dict[str, Any]]) -> GitLabCIRetry:
+def parse_retry(value: Union[int, dict[str, Any]]) -> GitLabCIRetry:
     """Parse retry configuration from various input formats."""
     if isinstance(value, int):
         if value not in [0, 1, 2]:

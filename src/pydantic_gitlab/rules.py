@@ -1,6 +1,6 @@
 """Rules structures for GitLab CI configuration."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import Field
 
@@ -10,7 +10,7 @@ from .base import GitLabCIBaseModel, VariableName, VariableValue, WhenType
 class GitLabCIRulesChanges(GitLabCIBaseModel):
     """Rules changes configuration."""
 
-    paths: Optional[List[str]] = None
+    paths: Optional[list[str]] = None
     compare_to: Optional[str] = Field(None, alias="compare_to")
 
 
@@ -24,7 +24,7 @@ class GitLabCIRulesIf(GitLabCIBaseModel):
 class GitLabCIRulesExists(GitLabCIBaseModel):
     """Rules exists configuration."""
 
-    paths: List[str]
+    paths: list[str]
     project: Optional[str] = None
     ref: Optional[str] = None
 
@@ -34,13 +34,13 @@ class GitLabCIRule(GitLabCIBaseModel):
 
     # Conditions (at least one should be present)
     if_: Optional[str] = Field(None, alias="if")
-    changes: Optional[Union[List[str], GitLabCIRulesChanges]] = None
-    exists: Optional[Union[List[str], GitLabCIRulesExists]] = None
+    changes: Optional[Union[list[str], GitLabCIRulesChanges]] = None
+    exists: Optional[Union[list[str], GitLabCIRulesExists]] = None
 
     # Actions
     when: Optional[WhenType] = None
-    allow_failure: Optional[Union[bool, Dict[str, List[int]]]] = Field(None, alias="allow_failure")
-    variables: Optional[Dict[VariableName, VariableValue]] = None
+    allow_failure: Optional[Union[bool, dict[str, list[int]]]] = Field(None, alias="allow_failure")
+    variables: Optional[dict[VariableName, VariableValue]] = None
 
     # Job-specific rule options
     needs: Optional[Any] = None  # Will be defined properly in job.py

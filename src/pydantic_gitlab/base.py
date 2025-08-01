@@ -1,7 +1,7 @@
 """Base types and enums for GitLab CI configuration."""
 
 from enum import Enum
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -11,14 +11,14 @@ class GitLabCIBaseModel(BaseModel):
 
     model_config = {"extra": "allow", "populate_by_name": True}
 
-    def model_dump(self, **kwargs: Any) -> Dict[str, Any]:
+    def model_dump(self, **kwargs: Any) -> dict[str, Any]:
         """Dump model excluding None values by default."""
         if "exclude_none" not in kwargs:
             kwargs["exclude_none"] = True
         return super().model_dump(**kwargs)
 
     # Store unknown fields
-    extra_fields: Optional[Dict[str, Any]] = Field(default=None, exclude=True)
+    extra_fields: Optional[dict[str, Any]] = Field(default=None, exclude=True)
 
     def model_post_init(self, __context: Any) -> None:
         """Store extra fields after model initialization."""

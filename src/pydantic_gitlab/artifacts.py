@@ -1,6 +1,6 @@
 """Artifacts structures for GitLab CI configuration."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import Field, field_validator
 
@@ -10,29 +10,29 @@ from .base import ArtifactAccessType, ArtifactName, Duration, GitLabCIBaseModel,
 class GitLabCIArtifactsReports(GitLabCIBaseModel):
     """Artifacts reports configuration."""
 
-    junit: Optional[Union[str, List[str]]] = None
-    coverage_report: Optional[Union[str, Dict[str, Union[str, List[str]]]]] = Field(None, alias="coverage_report")
-    codequality: Optional[Union[str, List[str]]] = None
-    sast: Optional[Union[str, List[str]]] = None
-    dependency_scanning: Optional[Union[str, List[str]]] = Field(None, alias="dependency_scanning")
-    container_scanning: Optional[Union[str, List[str]]] = Field(None, alias="container_scanning")
-    dast: Optional[Union[str, List[str]]] = None
-    license_management: Optional[Union[str, List[str]]] = Field(None, alias="license_management")
-    license_scanning: Optional[Union[str, List[str]]] = Field(None, alias="license_scanning")
-    performance: Optional[Union[str, List[str]]] = None
-    requirements: Optional[Union[str, List[str]]] = None
-    secret_detection: Optional[Union[str, List[str]]] = Field(None, alias="secret_detection")
-    terraform: Optional[Union[str, List[str]]] = None
-    accessibility: Optional[Union[str, List[str]]] = None
-    cluster_image_scanning: Optional[Union[str, List[str]]] = Field(None, alias="cluster_image_scanning")
-    requirements_v2: Optional[Union[str, List[str]]] = Field(None, alias="requirements_v2")
-    api_fuzzing: Optional[Union[str, List[str]]] = Field(None, alias="api_fuzzing")
-    browser_performance: Optional[Union[str, List[str]]] = Field(None, alias="browser_performance")
-    coverage_fuzzing: Optional[Union[str, List[str]]] = Field(None, alias="coverage_fuzzing")
-    load_performance: Optional[Union[str, List[str]]] = Field(None, alias="load_performance")
-    metrics: Optional[Union[str, List[str]]] = None
-    repository_xray: Optional[Union[str, List[str]]] = Field(None, alias="repository_xray")
-    cyclonedx: Optional[Union[str, List[str]]] = None
+    junit: Optional[Union[str, list[str]]] = None
+    coverage_report: Optional[Union[str, dict[str, Union[str, list[str]]]]] = Field(None, alias="coverage_report")
+    codequality: Optional[Union[str, list[str]]] = None
+    sast: Optional[Union[str, list[str]]] = None
+    dependency_scanning: Optional[Union[str, list[str]]] = Field(None, alias="dependency_scanning")
+    container_scanning: Optional[Union[str, list[str]]] = Field(None, alias="container_scanning")
+    dast: Optional[Union[str, list[str]]] = None
+    license_management: Optional[Union[str, list[str]]] = Field(None, alias="license_management")
+    license_scanning: Optional[Union[str, list[str]]] = Field(None, alias="license_scanning")
+    performance: Optional[Union[str, list[str]]] = None
+    requirements: Optional[Union[str, list[str]]] = None
+    secret_detection: Optional[Union[str, list[str]]] = Field(None, alias="secret_detection")
+    terraform: Optional[Union[str, list[str]]] = None
+    accessibility: Optional[Union[str, list[str]]] = None
+    cluster_image_scanning: Optional[Union[str, list[str]]] = Field(None, alias="cluster_image_scanning")
+    requirements_v2: Optional[Union[str, list[str]]] = Field(None, alias="requirements_v2")
+    api_fuzzing: Optional[Union[str, list[str]]] = Field(None, alias="api_fuzzing")
+    browser_performance: Optional[Union[str, list[str]]] = Field(None, alias="browser_performance")
+    coverage_fuzzing: Optional[Union[str, list[str]]] = Field(None, alias="coverage_fuzzing")
+    load_performance: Optional[Union[str, list[str]]] = Field(None, alias="load_performance")
+    metrics: Optional[Union[str, list[str]]] = None
+    repository_xray: Optional[Union[str, list[str]]] = Field(None, alias="repository_xray")
+    cyclonedx: Optional[Union[str, list[str]]] = None
 
     @field_validator(
         "junit",
@@ -60,7 +60,7 @@ class GitLabCIArtifactsReports(GitLabCIBaseModel):
         mode="before",
     )
     @classmethod
-    def normalize_report_paths(cls, v: Any) -> Optional[Union[str, List[str]]]:
+    def normalize_report_paths(cls, v: Any) -> Optional[Union[str, list[str]]]:
         """Normalize report paths to list."""
         if v is None:
             return None
@@ -74,8 +74,8 @@ class GitLabCIArtifactsReports(GitLabCIBaseModel):
 class GitLabCIArtifacts(GitLabCIBaseModel):
     """Artifacts configuration."""
 
-    paths: Optional[List[str]] = None
-    exclude: Optional[List[str]] = None
+    paths: Optional[list[str]] = None
+    exclude: Optional[list[str]] = None
     expire_in: Optional[Duration] = Field(None, alias="expire_in")
     expose_as: Optional[str] = Field(None, alias="expose_as")
     name: Optional[ArtifactName] = None
@@ -87,7 +87,7 @@ class GitLabCIArtifacts(GitLabCIBaseModel):
 
     @field_validator("paths", mode="before")
     @classmethod
-    def normalize_paths(cls, v: Any) -> Optional[List[str]]:
+    def normalize_paths(cls, v: Any) -> Optional[list[str]]:
         """Normalize paths to list."""
         if v is None:
             return None
@@ -99,7 +99,7 @@ class GitLabCIArtifacts(GitLabCIBaseModel):
 
     @field_validator("exclude", mode="before")
     @classmethod
-    def normalize_exclude(cls, v: Any) -> Optional[List[str]]:
+    def normalize_exclude(cls, v: Any) -> Optional[list[str]]:
         """Normalize exclude to list."""
         if v is None:
             return None

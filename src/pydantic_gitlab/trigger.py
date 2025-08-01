@@ -1,6 +1,6 @@
 """Trigger structures for GitLab CI configuration."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import field_validator
 
@@ -14,7 +14,7 @@ class GitLabCITriggerSimple(GitLabCIBaseModel):
     project: str
     branch: Optional[GitRef] = None
     strategy: Optional[str] = None  # "depend"
-    forward: Optional[Dict[str, bool]] = None  # pipeline_variables, yaml_variables
+    forward: Optional[dict[str, bool]] = None  # pipeline_variables, yaml_variables
 
     @field_validator("strategy")
     @classmethod
@@ -28,13 +28,13 @@ class GitLabCITriggerSimple(GitLabCIBaseModel):
 class GitLabCITriggerInclude(GitLabCIBaseModel):
     """Trigger configuration with include."""
 
-    include: Union[GitLabCIInclude, List[GitLabCIInclude]]
+    include: Union[GitLabCIInclude, list[GitLabCIInclude]]
     strategy: Optional[str] = None  # "depend"
-    forward: Optional[Dict[str, bool]] = None  # pipeline_variables, yaml_variables
+    forward: Optional[dict[str, bool]] = None  # pipeline_variables, yaml_variables
 
     @field_validator("include", mode="before")
     @classmethod
-    def parse_include_field(cls, v: Any) -> Union[GitLabCIInclude, List[GitLabCIInclude]]:
+    def parse_include_field(cls, v: Any) -> Union[GitLabCIInclude, list[GitLabCIInclude]]:
         """Parse include field."""
         return parse_include(v)
 
@@ -51,7 +51,7 @@ class GitLabCITriggerInclude(GitLabCIBaseModel):
 GitLabCITrigger = Union[str, GitLabCITriggerSimple, GitLabCITriggerInclude]
 
 
-def parse_trigger(value: Union[str, Dict[str, Any]]) -> GitLabCITrigger:
+def parse_trigger(value: Union[str, dict[str, Any]]) -> GitLabCITrigger:
     """Parse trigger configuration from various input formats."""
     if isinstance(value, str):
         return value

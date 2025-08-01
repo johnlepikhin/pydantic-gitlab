@@ -1,6 +1,6 @@
 """Cache structures for GitLab CI configuration."""
 
-from typing import Any, List, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import Field, field_validator
 
@@ -11,12 +11,12 @@ class GitLabCICacheKey(GitLabCIBaseModel):
     """Cache key configuration."""
 
     key: Optional[str] = None  # Direct key string
-    files: Optional[List[str]] = None
+    files: Optional[list[str]] = None
     prefix: Optional[str] = None
 
     @field_validator("files", mode="before")
     @classmethod
-    def validate_files(cls, v: Any) -> Optional[List[str]]:
+    def validate_files(cls, v: Any) -> Optional[list[str]]:
         """Validate and normalize files list."""
         if v is None:
             return None
@@ -48,17 +48,17 @@ class GitLabCICacheKey(GitLabCIBaseModel):
 class GitLabCICache(GitLabCIBaseModel):
     """Cache configuration."""
 
-    paths: Optional[List[str]] = None
+    paths: Optional[list[str]] = None
     key: Optional[Union[CacheKey, GitLabCICacheKey]] = None
     untracked: Optional[bool] = None
     unprotect: Optional[bool] = None
     when: Optional[WhenType] = None
     policy: Optional[PolicyType] = None
-    fallback_keys: Optional[List[CacheKey]] = Field(None, alias="fallback_keys")
+    fallback_keys: Optional[list[CacheKey]] = Field(None, alias="fallback_keys")
 
     @field_validator("paths", mode="before")
     @classmethod
-    def normalize_paths(cls, v: Any) -> Optional[List[str]]:
+    def normalize_paths(cls, v: Any) -> Optional[list[str]]:
         """Normalize paths to list."""
         if v is None:
             return None
@@ -82,7 +82,7 @@ class GitLabCICache(GitLabCIBaseModel):
 
     @field_validator("fallback_keys", mode="before")
     @classmethod
-    def normalize_fallback_keys(cls, v: Any) -> Optional[List[CacheKey]]:
+    def normalize_fallback_keys(cls, v: Any) -> Optional[list[CacheKey]]:
         """Normalize fallback_keys to list."""
         if v is None:
             return None

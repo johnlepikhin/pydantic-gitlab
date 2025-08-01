@@ -1,6 +1,6 @@
 """Main GitLab CI configuration structure."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 import yaml
 from pydantic import Field, field_validator, model_validator
@@ -23,22 +23,22 @@ class GitLabCI(GitLabCIBaseModel):
     spec: Optional[GitLabCISpec] = None
 
     # Global keywords
-    cache: Optional[Union[GitLabCICache, List[GitLabCICache]]] = None
+    cache: Optional[Union[GitLabCICache, list[GitLabCICache]]] = None
     default: Optional[GitLabCIDefault] = None
-    include: Optional[Union[GitLabCIInclude, List[GitLabCIInclude]]] = None
-    stages: Optional[List[StageName]] = None
+    include: Optional[Union[GitLabCIInclude, list[GitLabCIInclude]]] = None
+    stages: Optional[list[StageName]] = None
     variables: Optional[GitLabCIVariables] = None
     workflow: Optional[GitLabCIWorkflow] = None
 
     # Jobs - stored separately from other fields
-    jobs: Dict[JobName, Union[GitLabCIJob, GitLabCIPages]] = Field(default_factory=dict, exclude=True)
+    jobs: dict[JobName, Union[GitLabCIJob, GitLabCIPages]] = Field(default_factory=dict, exclude=True)
 
     # Special handling for !reference tags
-    references: Dict[str, Any] = Field(default_factory=dict, exclude=True)
+    references: dict[str, Any] = Field(default_factory=dict, exclude=True)
 
     @field_validator("include", mode="before")
     @classmethod
-    def parse_include_field(cls, v: Any) -> Optional[Union[GitLabCIInclude, List[GitLabCIInclude]]]:
+    def parse_include_field(cls, v: Any) -> Optional[Union[GitLabCIInclude, list[GitLabCIInclude]]]:
         """Parse include field."""
         if v is None:
             return None
@@ -46,7 +46,7 @@ class GitLabCI(GitLabCIBaseModel):
 
     @field_validator("stages", mode="before")
     @classmethod
-    def normalize_stages(cls, v: Any) -> Optional[List[StageName]]:
+    def normalize_stages(cls, v: Any) -> Optional[list[StageName]]:
         """Normalize stages to list."""
         if v is None:
             return None
@@ -77,7 +77,7 @@ class GitLabCI(GitLabCIBaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def extract_jobs(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+    def extract_jobs(cls, values: dict[str, Any]) -> dict[str, Any]:
         """Extract job definitions from the configuration."""
         # Known global keywords that are not jobs
         global_keywords = {
@@ -92,8 +92,8 @@ class GitLabCI(GitLabCIBaseModel):
         }
 
         # Extract references (keys starting with .)
-        references: Dict[str, Any] = {}
-        jobs: Dict[str, Union[GitLabCIJob, GitLabCIPages]] = {}
+        references: dict[str, Any] = {}
+        jobs: dict[str, Union[GitLabCIJob, GitLabCIPages]] = {}
 
         # Process all keys
         for key, value in list(values.items()):
@@ -132,7 +132,7 @@ class GitLabCI(GitLabCIBaseModel):
         """Remove a job and return it."""
         return self.jobs.pop(name, None)
 
-    def get_all_stages(self) -> List[str]:
+    def get_all_stages(self) -> list[str]:
         """Get all stages including defaults and job-defined stages."""
         # Start with defined stages or defaults
         stages = list(self.stages) if self.stages else [".pre", "build", "test", "deploy", ".post"]
@@ -144,7 +144,7 @@ class GitLabCI(GitLabCIBaseModel):
 
         return stages
 
-    def validate_job_dependencies(self) -> List[str]:
+    def validate_job_dependencies(self) -> list[str]:
         """Validate that job dependencies are valid."""
         errors = []
         job_names = set(self.jobs.keys())
@@ -170,7 +170,7 @@ class GitLabCI(GitLabCIBaseModel):
 
         return errors
 
-    def model_dump(self, **kwargs: Any) -> Dict[str, Any]:
+    def model_dump(self, **kwargs: Any) -> dict[str, Any]:
         """Custom serialization to include jobs in output."""
         # Get base model data
         data = super().model_dump(**kwargs)

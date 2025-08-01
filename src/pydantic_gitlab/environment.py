@@ -1,6 +1,6 @@
 """Environment structures for GitLab CI configuration."""
 
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import Field
 
@@ -11,7 +11,7 @@ class GitLabCIKubernetes(GitLabCIBaseModel):
     """Kubernetes configuration for environment."""
 
     namespace: Optional[str] = None
-    agent: Optional[Union[str, Dict[str, Any]]] = None
+    agent: Optional[Union[str, dict[str, Any]]] = None
     flux_resource_path: Optional[str] = Field(None, alias="flux_resource_path")
 
 
@@ -40,7 +40,7 @@ class GitLabCIEnvironment(GitLabCIBaseModel):
             raise ValueError("'auto_stop_in' cannot be used with action: stop")
 
 
-def parse_environment(value: Union[str, Dict[str, Any]]) -> GitLabCIEnvironment:
+def parse_environment(value: Union[str, dict[str, Any]]) -> GitLabCIEnvironment:
     """Parse environment configuration from various input formats."""
     if isinstance(value, str):
         return GitLabCIEnvironment.from_string(value)

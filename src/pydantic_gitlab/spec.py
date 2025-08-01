@@ -1,6 +1,6 @@
 """Spec structures for GitLab CI configuration."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from pydantic import Field, field_validator
 
@@ -10,15 +10,15 @@ from .base import GitLabCIBaseModel, InputType
 class GitLabCISpecInput(GitLabCIBaseModel):
     """Single input specification."""
 
-    default: Optional[Union[str, int, bool, List[Any]]] = None
+    default: Optional[Union[str, int, bool, list[Any]]] = None
     description: Optional[str] = None
-    options: Optional[List[Union[str, int]]] = None
+    options: Optional[list[Union[str, int]]] = None
     regex: Optional[str] = None
     type: Optional[InputType] = None
 
     @field_validator("options")
     @classmethod
-    def validate_options(cls, v: Optional[List[Any]]) -> Optional[List[Union[str, int]]]:
+    def validate_options(cls, v: Optional[list[Any]]) -> Optional[list[Union[str, int]]]:
         """Validate options list."""
         if v is not None and len(v) > 50:
             raise ValueError("Input can have maximum 50 options")
@@ -61,7 +61,7 @@ class GitLabCISpecInputs(GitLabCIBaseModel):
     """Inputs specification for included configurations."""
 
     # Dynamic inputs stored as dict
-    inputs: Dict[str, GitLabCISpecInput] = Field(default_factory=dict)
+    inputs: dict[str, GitLabCISpecInput] = Field(default_factory=dict)
 
     def __init__(self, **data: Any) -> None:
         """Initialize with input specifications."""

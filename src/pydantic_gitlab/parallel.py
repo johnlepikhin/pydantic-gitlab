@@ -1,6 +1,6 @@
 """Parallel job structures for GitLab CI configuration."""
 
-from typing import Any, Dict, List, Union
+from typing import Any, Union
 
 from pydantic import field_validator
 
@@ -11,11 +11,11 @@ class GitLabCIParallelMatrix(GitLabCIBaseModel):
     """Parallel matrix configuration."""
 
     # Matrix is a list of dictionaries with variable combinations
-    matrix: List[Dict[str, Union[str, List[str]]]]
+    matrix: list[dict[str, Union[str, list[str]]]]
 
     @field_validator("matrix")
     @classmethod
-    def validate_matrix(cls, v: List[Dict[str, Any]]) -> List[Dict[str, Union[str, List[str]]]]:
+    def validate_matrix(cls, v: list[dict[str, Any]]) -> list[dict[str, Union[str, list[str]]]]:
         """Validate matrix configuration."""
         if not v:
             raise ValueError("Matrix cannot be empty")
@@ -33,11 +33,11 @@ class GitLabCIParallelMatrix(GitLabCIBaseModel):
 class GitLabCIParallelObject(GitLabCIBaseModel):
     """Parallel object configuration."""
 
-    matrix: List[Dict[str, Union[str, List[str]]]]
+    matrix: list[dict[str, Union[str, list[str]]]]
 
     @field_validator("matrix")
     @classmethod
-    def validate_matrix(cls, v: List[Dict[str, Any]]) -> List[Dict[str, Union[str, List[str]]]]:
+    def validate_matrix(cls, v: list[dict[str, Any]]) -> list[dict[str, Union[str, list[str]]]]:
         """Validate matrix configuration."""
         if not v:
             raise ValueError("Matrix cannot be empty")
@@ -48,7 +48,7 @@ class GitLabCIParallelObject(GitLabCIBaseModel):
 GitLabCIParallel = Union[int, GitLabCIParallelObject]
 
 
-def parse_parallel(value: Union[int, Dict[str, Any]]) -> GitLabCIParallel:
+def parse_parallel(value: Union[int, dict[str, Any]]) -> GitLabCIParallel:
     """Parse parallel configuration from various input formats."""
     if isinstance(value, int):
         if value < 2 or value > 200:

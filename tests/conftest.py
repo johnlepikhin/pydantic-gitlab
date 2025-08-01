@@ -1,7 +1,7 @@
 """Shared pytest fixtures and configuration."""
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 import yaml
@@ -17,7 +17,7 @@ def sample_configs_dir() -> Path:
 def load_fixture():
     """Load a fixture file."""
 
-    def _load(filename: str) -> Dict[str, Any]:
+    def _load(filename: str) -> dict[str, Any]:
         fixture_path = Path(__file__).parent / "fixtures" / filename
         with fixture_path.open() as f:
             return yaml.safe_load(f)
@@ -26,13 +26,13 @@ def load_fixture():
 
 
 @pytest.fixture
-def minimal_job_config() -> Dict[str, Any]:
+def minimal_job_config() -> dict[str, Any]:
     """Minimal valid job configuration."""
     return {"script": ["echo 'Hello World'"]}
 
 
 @pytest.fixture
-def complex_job_config() -> Dict[str, Any]:
+def complex_job_config() -> dict[str, Any]:
     """Complex job configuration with many fields."""
     return {
         "stage": "test",
@@ -52,13 +52,13 @@ def complex_job_config() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def minimal_ci_config() -> Dict[str, Any]:
+def minimal_ci_config() -> dict[str, Any]:
     """Minimal valid CI configuration."""
     return {"test-job": {"script": ["echo 'test'"]}}
 
 
 @pytest.fixture
-def complex_ci_config() -> Dict[str, Any]:
+def complex_ci_config() -> dict[str, Any]:
     """Complex CI configuration with multiple features."""
     return {
         "stages": ["build", "test", "deploy"],

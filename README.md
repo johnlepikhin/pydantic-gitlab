@@ -1,5 +1,11 @@
 # Pydantic GitLab
 
+[![PyPI version](https://badge.fury.io/py/pydantic-gitlab.svg)](https://badge.fury.io/py/pydantic-gitlab)
+[![Python](https://img.shields.io/pypi/pyversions/pydantic-gitlab.svg)](https://pypi.org/project/pydantic-gitlab/)
+[![Test](https://github.com/johnlepikhin/pydantic-gitlab/workflows/test/badge.svg)](https://github.com/johnlepikhin/pydantic-gitlab/actions)
+[![Coverage](https://codecov.io/gh/johnlepikhin/pydantic-gitlab/branch/main/graph/badge.svg)](https://codecov.io/gh/johnlepikhin/pydantic-gitlab)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A modern Python library for parsing and validating GitLab CI YAML files using Pydantic dataclasses.
 
 ## Features
@@ -86,6 +92,46 @@ if errors:
     for error in errors:
         print(f"Error: {error}")
 ```
+
+## Why Pydantic GitLab?
+
+### Comparison with Plain YAML Parsing
+
+Using plain YAML parsing:
+```python
+import yaml
+
+# Plain YAML - no validation, no type hints
+with open(".gitlab-ci.yml") as f:
+    config = yaml.safe_load(f)
+    
+# Risky - might fail at runtime
+job_script = config["build"]["script"]  # KeyError?
+job_image = config["build"]["image"]    # KeyError?
+```
+
+Using Pydantic GitLab:
+```python
+from pydantic_gitlab import GitLabCI
+
+# Type-safe with validation
+with open(".gitlab-ci.yml") as f:
+    data = yaml.safe_load(f)
+ci = GitLabCI(**data)
+
+# IDE autocompletion, type checking
+if build_job := ci.get_job("build"):
+    print(build_job.script)  # Guaranteed to exist
+    print(build_job.image)   # Optional[str] - might be None
+```
+
+### Benefits
+
+- **🛡️ Validation**: Catch configuration errors before running pipelines
+- **🔍 Type Safety**: Full type hints for better IDE support and fewer runtime errors
+- **📝 Documentation**: Each field is documented with GitLab CI reference
+- **🚀 Productivity**: Autocomplete for all GitLab CI keywords
+- **🧪 Testing**: Easily create and validate CI configurations in tests
 
 ## Development
 

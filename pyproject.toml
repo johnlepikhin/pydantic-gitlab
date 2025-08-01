@@ -5,14 +5,14 @@ build-backend = "hatchling.build"
 [project]
 name = "pydantic-gitlab"
 version = "0.1.0"
-description = "A modern Python library"
+description = "Pydantic models for parsing and validating GitLab CI/CD YAML configuration files"
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
 authors = [
     {name = "Evgenii Lepikhin", email = "johnlepikhin@gmail.com"},
 ]
-keywords = ["python", "library"]
+keywords = ["gitlab", "gitlab-ci", "ci-cd", "yaml", "pydantic", "validation", "parser", "devops", "continuous-integration", "gitlab-pipeline", "type-safety"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",

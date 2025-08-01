@@ -3,7 +3,6 @@
 [![PyPI version](https://badge.fury.io/py/pydantic-gitlab.svg)](https://badge.fury.io/py/pydantic-gitlab)
 [![Python](https://img.shields.io/pypi/pyversions/pydantic-gitlab.svg)](https://pypi.org/project/pydantic-gitlab/)
 [![Test](https://github.com/johnlepikhin/pydantic-gitlab/workflows/test/badge.svg)](https://github.com/johnlepikhin/pydantic-gitlab/actions)
-[![Coverage](https://codecov.io/gh/johnlepikhin/pydantic-gitlab/branch/main/graph/badge.svg)](https://codecov.io/gh/johnlepikhin/pydantic-gitlab)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A modern Python library for parsing and validating GitLab CI YAML files using Pydantic dataclasses.

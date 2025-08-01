@@ -30,14 +30,14 @@ test-job:
     gitlab_ci = GitLabCI(**data)
 
     # Check that references are preserved
-    job = gitlab_ci.jobs['test-job']
+    job = gitlab_ci.jobs["test-job"]
     assert len(job.script) == 2
-    assert str(job.script[0]).startswith('GitLabReference')
+    assert str(job.script[0]).startswith("GitLabReference")
     assert job.script[1] == 'echo "Additional command"'
 
     # Check serialization
     yaml_output = safe_dump_gitlab_yaml(data)
-    assert '!reference' in yaml_output
+    assert "!reference" in yaml_output
 
 
 def test_gitlab_reference_in_variables():
@@ -69,16 +69,16 @@ deploy-job:
     gitlab_ci = GitLabCI(**data)
 
     # Check whole variables reference
-    test_job = gitlab_ci.jobs['test-job']
-    assert str(test_job.variables).startswith('GitLabReference')
+    test_job = gitlab_ci.jobs["test-job"]
+    assert str(test_job.variables).startswith("GitLabReference")
 
     # Check individual variable references
-    deploy_job = gitlab_ci.jobs['deploy-job']
+    deploy_job = gitlab_ci.jobs["deploy-job"]
     # When dict contains GitLabReference, it's preserved as dict in our validator
     assert deploy_job.variables is not None
     # The variables should contain GitLabReference objects
-    vars_dict = deploy_job.variables.variables if hasattr(deploy_job.variables, 'variables') else deploy_job.variables
-    assert 'CUSTOM_VAR' in vars_dict
+    vars_dict = deploy_job.variables.variables if hasattr(deploy_job.variables, "variables") else deploy_job.variables
+    assert "CUSTOM_VAR" in vars_dict
 
 
 def test_gitlab_reference_in_rules():
@@ -111,12 +111,12 @@ deploy-job:
     gitlab_ci = GitLabCI(**data)
 
     # Check rules reference
-    test_job = gitlab_ci.jobs['test-job']
+    test_job = gitlab_ci.jobs["test-job"]
     assert len(test_job.rules) == 1
-    assert str(test_job.rules[0]).startswith('GitLabReference')
+    assert str(test_job.rules[0]).startswith("GitLabReference")
 
     # Check mixed rules
-    deploy_job = gitlab_ci.jobs['deploy-job']
+    deploy_job = gitlab_ci.jobs["deploy-job"]
     assert len(deploy_job.rules) == 2
 
 
@@ -141,8 +141,8 @@ test-job:
     gitlab_ci = GitLabCI(**data)
 
     # Check that reference was resolved
-    job = gitlab_ci.jobs['test-job']
-    assert job.before_script == ['echo "Setup"', 'source env.sh']
+    job = gitlab_ci.jobs["test-job"]
+    assert job.before_script == ['echo "Setup"', "source env.sh"]
 
 
 def test_gitlab_reference_roundtrip():
@@ -175,4 +175,4 @@ job:
     assert data1 == data2
 
     # Should preserve !reference tags
-    assert '!reference' in yaml_output
+    assert "!reference" in yaml_output

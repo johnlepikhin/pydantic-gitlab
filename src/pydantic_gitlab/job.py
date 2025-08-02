@@ -1,8 +1,8 @@
 """Job structure for GitLab CI configuration."""
 
-from typing import Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 from .artifacts import GitLabCIArtifacts
 from .base import (
@@ -24,6 +24,9 @@ from .retry import GitLabCIRetry, parse_retry
 from .rules import GitLabCIRule
 from .services import GitLabCIImage, GitLabCIService, parse_image, parse_services
 from .trigger import GitLabCITrigger, parse_trigger
+
+if TYPE_CHECKING:
+    from .yaml_parser import GitLabReference
 
 
 class GitLabCIJobVariables(GitLabCIBaseModel):
@@ -141,6 +144,8 @@ class GitLabCIJobIdentity(GitLabCIBaseModel):
 class GitLabCIJob(GitLabCIBaseModel):
     """GitLab CI job configuration."""
 
+    model_config = {"arbitrary_types_allowed": True}  # noqa: RUF012
+
     # Core job definition
     script: Optional[list[Union[str, Any]]] = None
     run: Optional[list[str]] = None  # Alternative to script
@@ -167,7 +172,7 @@ class GitLabCIJob(GitLabCIBaseModel):
     # Dependencies and artifacts
     needs: Optional[list[GitLabCINeeds]] = None
     dependencies: Optional[list[JobName]] = None
-    artifacts: Optional[GitLabCIArtifacts] = None
+    artifacts: Optional[Union[GitLabCIArtifacts, "GitLabReference"]] = None
 
     # Environment and deployment
     environment: Optional[Union[str, GitLabCIEnvironment]] = None
@@ -422,6 +427,28 @@ class GitLabCIJob(GitLabCIBaseModel):
             return GitLabCIJobVariables(**v)
         raise ValueError(f"Invalid variables value: {v}")
 
+    @model_validator(mode="before")
+    @classmethod
+    def validate_artifacts_field(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Validate and transform artifacts field."""
+        if "artifacts" in values and values["artifacts"] is not None:
+            v = values["artifacts"]
+            # Check if it's a GitLabReference
+            from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+            if isinstance(v, GitLabReference):
+                # Keep GitLabReference objects as is
+                pass
+            elif isinstance(v, GitLabCIArtifacts):
+                # Already the right type
+                pass
+            elif isinstance(v, dict):
+                # Convert dict to GitLabCIArtifacts
+                values["artifacts"] = GitLabCIArtifacts(**v)
+            else:
+                raise ValueError(f"Invalid artifacts value: {v}")
+        return values
+
     def model_post_init(self, __context: Any) -> None:
         """Validate job configuration."""
         super().model_post_init(__context)
@@ -441,3 +468,9 @@ class GitLabCIJob(GitLabCIBaseModel):
         # start_in only for delayed jobs
         if self.start_in and self.when != WhenType.DELAYED:
             raise ValueError("'start_in' can only be used with 'when: delayed'")
+
+
+# Rebuild model to resolve forward references
+from .yaml_parser import GitLabReference  # noqa: E402
+
+GitLabCIJob.model_rebuild()

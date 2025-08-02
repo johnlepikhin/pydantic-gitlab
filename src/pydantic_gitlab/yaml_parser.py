@@ -49,7 +49,7 @@ def reference_constructor(loader: GitLabYAMLLoader, node: yaml.nodes.Node) -> Gi
 
 
 # Register GitLab CI specific tags
-GitLabYAMLLoader.add_constructor("!reference", reference_constructor)
+# Note: We handle !reference in the generic_tag_constructor to avoid conflicts
 
 
 def reference_representer(dumper: GitLabYAMLDumper, data: GitLabReference) -> yaml.nodes.Node:
@@ -63,8 +63,12 @@ GitLabYAMLDumper.add_representer(GitLabReference, reference_representer)
 
 # Support for other GitLab CI tags
 # For now, we'll just pass them through as strings
-def generic_tag_constructor(loader: GitLabYAMLLoader, suffix: str, node: yaml.nodes.Node) -> str:
+def generic_tag_constructor(loader: GitLabYAMLLoader, suffix: str, node: yaml.nodes.Node) -> Any:
     """Generic constructor for unknown tags - just preserve as string."""
+    # Skip if this is a reference tag - it has its own constructor
+    if suffix == "reference":
+        return reference_constructor(loader, node)
+
     if isinstance(node, yaml.ScalarNode):
         return f"!{suffix} {loader.construct_scalar(node)}"
     if isinstance(node, yaml.SequenceNode):

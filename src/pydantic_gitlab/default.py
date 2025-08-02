@@ -1,8 +1,8 @@
 """Default configuration for GitLab CI."""
 
-from typing import Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 from .artifacts import GitLabCIArtifacts
 from .base import Duration, GitLabCIBaseModel
@@ -10,6 +10,9 @@ from .cache import GitLabCICache
 from .job import GitLabCIJobHooks
 from .retry import GitLabCIRetry, parse_retry
 from .services import GitLabCIImage, GitLabCIService, parse_image, parse_services
+
+if TYPE_CHECKING:
+    from .yaml_parser import GitLabReference
 
 
 class GitLabCIIdToken(GitLabCIBaseModel):
@@ -33,8 +36,10 @@ class GitLabCIIdToken(GitLabCIBaseModel):
 class GitLabCIDefault(GitLabCIBaseModel):
     """Default configuration for all jobs."""
 
+    model_config = {"arbitrary_types_allowed": True}  # noqa: RUF012
+
     after_script: Optional[list[Union[str, Any]]] = Field(None, alias="after_script")
-    artifacts: Optional[GitLabCIArtifacts] = None
+    artifacts: Optional[Union[GitLabCIArtifacts, "GitLabReference"]] = None
     before_script: Optional[list[Union[str, Any]]] = Field(None, alias="before_script")
     cache: Optional[Union[GitLabCICache, list[GitLabCICache]]] = None
     hooks: Optional[GitLabCIJobHooks] = None
@@ -83,6 +88,26 @@ class GitLabCIDefault(GitLabCIBaseModel):
                 return v
             return v
         raise ValueError(f"Invalid value: {v}")
+
+    @field_validator("artifacts", mode="before")
+    @classmethod
+    def parse_artifacts_field(cls, v: Any) -> Any:
+        """Parse artifacts field."""
+        if v is None:
+            return None
+        # Check if it's a GitLabReference
+        from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+        if isinstance(v, GitLabReference):
+            # Keep GitLabReference objects as is
+            return v
+        # If it's already a GitLabCIArtifacts instance, return it
+        if isinstance(v, GitLabCIArtifacts):
+            return v
+        # If it's a dict, create GitLabCIArtifacts from it
+        if isinstance(v, dict):
+            return GitLabCIArtifacts(**v)
+        raise ValueError(f"Invalid artifacts value: {v}")
 
     @field_validator("cache", mode="before")
     @classmethod
@@ -148,3 +173,31 @@ class GitLabCIDefault(GitLabCIBaseModel):
             else:
                 raise ValueError(f"Invalid id_token configuration for '{key}'")
         return result
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_artifacts_field(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Validate and transform artifacts field."""
+        if "artifacts" in values and values["artifacts"] is not None:
+            v = values["artifacts"]
+            # Check if it's a GitLabReference
+            from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+            if isinstance(v, GitLabReference):
+                # Keep GitLabReference objects as is
+                pass
+            elif isinstance(v, GitLabCIArtifacts):
+                # Already the right type
+                pass
+            elif isinstance(v, dict):
+                # Convert dict to GitLabCIArtifacts
+                values["artifacts"] = GitLabCIArtifacts(**v)
+            else:
+                raise ValueError(f"Invalid artifacts value: {v}")
+        return values
+
+
+# Rebuild model to resolve forward references
+from .yaml_parser import GitLabReference  # noqa: E402
+
+GitLabCIDefault.model_rebuild()

@@ -24,7 +24,15 @@ class GitLabCIPages(GitLabCIJob):
         super().model_post_init(__context)
 
         # Pages job should have artifacts with public path
-        if self.artifacts and self.artifacts.paths:
+        # Check if it's a GitLabReference - if so, skip validation
+        from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+        if (
+            self.artifacts
+            and not isinstance(self.artifacts, GitLabReference)
+            and hasattr(self.artifacts, "paths")
+            and self.artifacts.paths
+        ):
             # In GitLab 17.10+, public is automatically added if not present
             # But we don't enforce this as it depends on GitLab version
             pass

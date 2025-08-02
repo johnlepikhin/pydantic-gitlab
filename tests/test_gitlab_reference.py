@@ -176,3 +176,33 @@ job:
 
     # Should preserve !reference tags
     assert "!reference" in yaml_output
+
+
+def test_gitlab_reference_in_artifacts():
+    """Test GitLabReference in artifacts field."""
+    # Use raw string to avoid escaping issues
+    yaml_content = r""".store_job_artifacts:
+  artifacts:
+    paths:
+      - build/
+    expire_in: 1 week
+
+generate-build-id:
+  stage: Common prepare
+  before_script: ./scripts/runner-provisioner.sh
+  script: ./scripts/generate-build-id
+  artifacts: !reference [.store_job_artifacts, artifacts]
+"""
+    # Parse without resolving
+    data = safe_load_gitlab_yaml(yaml_content, resolve_refs=False)
+
+    # Should parse successfully
+    gitlab_ci = GitLabCI(**data)
+
+    # Check that reference is preserved
+    job = gitlab_ci.jobs["generate-build-id"]
+    assert str(job.artifacts).startswith("GitLabReference")
+
+    # Check serialization
+    yaml_output = safe_dump_gitlab_yaml(data)
+    assert "!reference" in yaml_output

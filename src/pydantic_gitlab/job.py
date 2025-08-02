@@ -1,5 +1,6 @@
 """Job structure for GitLab CI configuration."""
 
+import re
 from typing import TYPE_CHECKING, Any, Optional, Union
 
 from pydantic import Field, field_validator, model_validator
@@ -170,7 +171,7 @@ class GitLabCIJob(GitLabCIBaseModel):
     hooks: Optional[GitLabCIJobHooks] = None
 
     # Dependencies and artifacts
-    needs: Optional[list[GitLabCINeeds]] = None
+    needs: Optional[Union[list[GitLabCINeeds], "GitLabReference"]] = None
     dependencies: Optional[list[JobName]] = None
     artifacts: Optional[Union[GitLabCIArtifacts, "GitLabReference"]] = None
 
@@ -339,10 +340,16 @@ class GitLabCIJob(GitLabCIBaseModel):
 
     @field_validator("needs", mode="before")
     @classmethod
-    def parse_needs_field(cls, v: Any) -> Optional[list[GitLabCINeeds]]:
+    def parse_needs_field(cls, v: Any) -> Any:
         """Parse needs field."""
         if v is None:
             return None
+        # Check if it's a GitLabReference
+        from .yaml_parser import GitLabReference  # noqa: PLC0415
+
+        if isinstance(v, GitLabReference):
+            # Keep GitLabReference objects as is
+            return v
         return parse_needs(v)
 
     @field_validator("environment", mode="before")
@@ -445,6 +452,17 @@ class GitLabCIJob(GitLabCIBaseModel):
             elif isinstance(v, dict):
                 # Convert dict to GitLabCIArtifacts
                 values["artifacts"] = GitLabCIArtifacts(**v)
+            elif isinstance(v, str) and v.startswith("\\!reference "):
+                # Handle escaped !reference strings from YAML parsing
+                # Convert back to GitLabReference object
+                match = re.match(r"\\!reference \[(.*?)\]", v)
+                if match:
+                    path_str = match.group(1)
+                    # Parse the path - it should be comma-separated strings
+                    path_parts = [part.strip().strip("'\"") for part in path_str.split(",")]
+                    values["artifacts"] = GitLabReference(path_parts)
+                else:
+                    raise ValueError(f"Invalid reference format: {v}")
             else:
                 raise ValueError(f"Invalid artifacts value: {v}")
         return values

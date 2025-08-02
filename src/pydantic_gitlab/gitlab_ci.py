@@ -151,7 +151,7 @@ class GitLabCI(GitLabCIBaseModel):
 
         for job_name, job in self.jobs.items():
             # Check needs
-            if job.needs:
+            if job.needs and isinstance(job.needs, list):
                 for need in job.needs:
                     if isinstance(need, str) and need not in job_names:
                         errors.append(f"Job '{job_name}' needs non-existent job '{need}'")

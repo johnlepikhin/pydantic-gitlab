@@ -206,3 +206,36 @@ generate-build-id:
     # Check serialization
     yaml_output = safe_dump_gitlab_yaml(data)
     assert "!reference" in yaml_output
+
+
+def test_gitlab_reference_in_needs():
+    """Test GitLabReference in needs field."""
+    yaml_content = r""".needs_upstream_artifacts:
+  needs:
+    - build-upstream
+    - test-upstream
+
+generate-build-id:
+  extends: .common_job_template
+  stage: Common prepare
+  script:
+    - !reference [.python_path_setup]
+    - ./scripts/generate-build-id
+  needs:
+    - !reference [.needs_upstream_artifacts, needs]
+"""
+    # Parse without resolving
+    data = safe_load_gitlab_yaml(yaml_content, resolve_refs=False)
+
+    # Should parse successfully
+    gitlab_ci = GitLabCI(**data)
+
+    # Check that reference is preserved
+    job = gitlab_ci.jobs["generate-build-id"]
+    # needs is a list containing a GitLabReference
+    assert len(job.needs) == 1
+    assert str(job.needs[0]).startswith("GitLabReference")
+
+    # Check serialization
+    yaml_output = safe_dump_gitlab_yaml(data)
+    assert "!reference" in yaml_output

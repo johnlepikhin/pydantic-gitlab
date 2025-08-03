@@ -239,3 +239,33 @@ generate-build-id:
     # Check serialization
     yaml_output = safe_dump_gitlab_yaml(data)
     assert "!reference" in yaml_output
+
+
+def test_job_with_when_always():
+    """Test job with when: always value to ensure Enum serialization works."""
+    yaml_content = r"""destroy-build-vms:
+  stage: Build
+  script:
+    - ./scripts/destroy-vms --create-vms-job-name create-build-vms
+  needs:
+    - job: create-build-vms
+    - job: setup-build-vms
+  when: always
+  allow_failure: true
+"""
+    # Parse
+    data = safe_load_gitlab_yaml(yaml_content)
+
+    # Should parse successfully
+    gitlab_ci = GitLabCI(**data)
+
+    # Check that when is parsed correctly
+    job = gitlab_ci.jobs["destroy-build-vms"]
+    assert job.when is not None
+    assert job.when.value == "always"  # Check the Enum value
+
+    # Test serialization - this was failing before
+    # Use mode='json' to convert Enum values to strings
+    yaml_output = safe_dump_gitlab_yaml(gitlab_ci.model_dump(mode="json"))
+    assert "when: always" in yaml_output
+    assert "allow_failure: true" in yaml_output

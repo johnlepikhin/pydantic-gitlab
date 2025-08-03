@@ -1,5 +1,6 @@
 """YAML parser with GitLab CI specific tag support."""
 
+from enum import Enum
 from typing import Any
 
 import yaml
@@ -59,6 +60,16 @@ def reference_representer(dumper: GitLabYAMLDumper, data: GitLabReference) -> ya
 
 # Register representers for dumping
 GitLabYAMLDumper.add_representer(GitLabReference, reference_representer)
+
+
+def enum_representer(dumper: GitLabYAMLDumper, data: Enum) -> yaml.nodes.Node:
+    """Representer for Enum objects - convert to their string value."""
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data.value)
+
+
+# Register Enum representer
+GitLabYAMLDumper.add_representer(Enum, enum_representer)
+GitLabYAMLDumper.add_multi_representer(Enum, enum_representer)
 
 
 # Support for other GitLab CI tags

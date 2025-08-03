@@ -68,7 +68,7 @@ from .yaml_parser import (
     safe_load_gitlab_yaml,
 )
 
-__version__ = "0.2.3"
+__version__ = "0.2.4"
 
 __all__ = [
     "ArtifactAccessType",

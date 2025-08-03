@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 class GitLabCIBaseModel(BaseModel):
     """Base model for all GitLab CI structures."""
 
-    model_config = {"extra": "allow", "populate_by_name": True}
+    model_config = {"extra": "allow", "populate_by_name": True, "use_enum_values": True}
 
     def model_dump(self, **kwargs: Any) -> dict[str, Any]:
         """Dump model excluding None values by default."""

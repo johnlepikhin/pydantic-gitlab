@@ -191,6 +191,9 @@ class GitLabCI(GitLabCIBaseModel):
 
     def model_dump_yaml(self, **kwargs: Any) -> str:
         """Serialize to YAML format."""
+        # Ensure mode='json' is used to properly serialize Enums
+        if "mode" not in kwargs:
+            kwargs["mode"] = "json"
         data = self.model_dump(**kwargs)
 
         # Handle spec section separately if present

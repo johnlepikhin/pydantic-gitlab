@@ -262,7 +262,11 @@ def test_job_with_when_always():
     # Check that when is parsed correctly
     job = gitlab_ci.jobs["destroy-build-vms"]
     assert job.when is not None
-    assert job.when.value == "always"  # Check the Enum value
+    # Handle both cases: when as Enum or as string (depending on use_enum_values setting)
+    if hasattr(job.when, "value"):
+        assert job.when.value == "always"
+    else:
+        assert job.when == "always"
 
     # Test serialization - this was failing before
     # Use mode='json' to convert Enum values to strings

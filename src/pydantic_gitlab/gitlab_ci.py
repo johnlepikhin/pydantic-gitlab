@@ -31,14 +31,18 @@ class GitLabCI(GitLabCIBaseModel):
     workflow: Optional[GitLabCIWorkflow] = None
 
     # Jobs - stored separately from other fields
-    jobs: dict[JobName, Union[GitLabCIJob, GitLabCIPages]] = Field(default_factory=dict, exclude=True)
+    jobs: dict[JobName, Union[GitLabCIJob, GitLabCIPages]] = Field(
+        default_factory=dict, exclude=True
+    )
 
     # Special handling for !reference tags
     references: dict[str, Any] = Field(default_factory=dict, exclude=True)
 
     @field_validator("include", mode="before")
     @classmethod
-    def parse_include_field(cls, v: Any) -> Optional[Union[GitLabCIInclude, list[GitLabCIInclude]]]:
+    def parse_include_field(
+        cls, v: Any
+    ) -> Optional[Union[GitLabCIInclude, list[GitLabCIInclude]]]:
         """Parse include field."""
         if v is None:
             return None
@@ -104,7 +108,17 @@ class GitLabCI(GitLabCIBaseModel):
                 values.pop(key, None)
             elif key not in global_keywords and isinstance(value, dict):
                 # Check if this looks like a job definition
-                job_keywords = {"script", "run", "trigger", "extends", "stage", "when", "rules", "only", "except"}
+                job_keywords = {
+                    "script",
+                    "run",
+                    "trigger",
+                    "extends",
+                    "stage",
+                    "when",
+                    "rules",
+                    "only",
+                    "except",
+                }
                 if any(k in value for k in job_keywords):
                     # Special handling for pages job
                     if key == "pages":
@@ -135,7 +149,11 @@ class GitLabCI(GitLabCIBaseModel):
     def get_all_stages(self) -> list[str]:
         """Get all stages including defaults and job-defined stages."""
         # Start with defined stages or defaults
-        stages = list(self.stages) if self.stages else [".pre", "build", "test", "deploy", ".post"]
+        stages = (
+            list(self.stages)
+            if self.stages
+            else [".pre", "build", "test", "deploy", ".post"]
+        )
 
         # Add any stages defined in jobs
         for job in self.jobs.values():
@@ -154,19 +172,25 @@ class GitLabCI(GitLabCIBaseModel):
             if job.needs and isinstance(job.needs, list):
                 for need in job.needs:
                     if isinstance(need, str) and need not in job_names:
-                        errors.append(f"Job '{job_name}' needs non-existent job '{need}'")
+                        errors.append(
+                            f"Job '{job_name}' needs non-existent job '{need}'"
+                        )
 
             # Check dependencies
             if job.dependencies:
                 for dep in job.dependencies:
                     if dep not in job_names:
-                        errors.append(f"Job '{job_name}' depends on non-existent job '{dep}'")
+                        errors.append(
+                            f"Job '{job_name}' depends on non-existent job '{dep}'"
+                        )
 
             # Check environment on_stop
             if job.environment and isinstance(job.environment, dict):
                 on_stop = job.environment.get("on_stop")
                 if on_stop and on_stop not in job_names:
-                    errors.append(f"Job '{job_name}' environment on_stop references non-existent job '{on_stop}'")
+                    errors.append(
+                        f"Job '{job_name}' environment on_stop references non-existent job '{on_stop}'"
+                    )
 
         return errors
 
@@ -191,6 +215,8 @@ class GitLabCI(GitLabCIBaseModel):
 
     def model_dump_yaml(self, **kwargs: Any) -> str:
         """Serialize to YAML format."""
+        from .yaml_parser import GitLabYAMLDumper
+
         # Ensure mode='json' is used to properly serialize Enums
         if "mode" not in kwargs:
             kwargs["mode"] = "json"
@@ -203,11 +229,25 @@ class GitLabCI(GitLabCIBaseModel):
 
         # Add spec section with separator if present
         if spec_data:
-            yaml_parts.append(yaml.dump({"spec": spec_data}, default_flow_style=False, sort_keys=False))
+            yaml_parts.append(
+                yaml.dump(
+                    {"spec": spec_data},
+                    Dumper=GitLabYAMLDumper,
+                    default_flow_style=False,
+                    sort_keys=False,
+                )
+            )
             yaml_parts.append("---")
 
         # Add main configuration
         if data:
-            yaml_parts.append(yaml.dump(data, default_flow_style=False, sort_keys=False))
+            yaml_parts.append(
+                yaml.dump(
+                    data,
+                    Dumper=GitLabYAMLDumper,
+                    default_flow_style=False,
+                    sort_keys=False,
+                )
+            )
 
         return "\n".join(yaml_parts)

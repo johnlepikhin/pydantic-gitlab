@@ -72,6 +72,23 @@ GitLabYAMLDumper.add_representer(Enum, enum_representer)
 GitLabYAMLDumper.add_multi_representer(Enum, enum_representer)
 
 
+def pydantic_model_representer(dumper: GitLabYAMLDumper, data: Any) -> yaml.nodes.Node:
+    """Representer for Pydantic model objects - convert to their dict representation."""
+    from .base import GitLabCIBaseModel
+    
+    if isinstance(data, GitLabCIBaseModel):
+        # Use model_dump with exclude_none=True to get clean dict representation
+        return dumper.represent_dict(data.model_dump(exclude_none=True, mode="json"))
+    
+    # Fallback for other objects
+    return dumper.represent_dict(data.__dict__)
+
+
+# Register Pydantic model representer
+from .base import GitLabCIBaseModel
+GitLabYAMLDumper.add_multi_representer(GitLabCIBaseModel, pydantic_model_representer)
+
+
 # Support for other GitLab CI tags
 # For now, we'll just pass them through as strings
 def generic_tag_constructor(loader: GitLabYAMLLoader, suffix: str, node: yaml.nodes.Node) -> Any:
